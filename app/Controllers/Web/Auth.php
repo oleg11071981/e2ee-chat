@@ -4,6 +4,7 @@ namespace App\Controllers\Web;
 
 use App\Controllers\BaseController;
 use App\Models\User;
+use App\Models\PasswordResetModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use Random\RandomException;
 use ReflectionException;
@@ -14,8 +15,8 @@ use ReflectionException;
  * Обрабатывает запросы на регистрацию, вход, восстановление пароля
  * и выход из системы через веб-интерфейс (не API).
  *
- * @noinspection PhpUnused
  * @package App\Controllers\Web
+ * @noinspection PhpUnused
  */
 class Auth extends BaseController
 {
@@ -32,12 +33,14 @@ class Auth extends BaseController
     public function __construct()
     {
         $this->userModel = new User();
+        helper('email'); // Подключаем хелпер для отправки писем
     }
 
     /**
      * Страница входа
      *
      * @return string|RedirectResponse
+     * @noinspection PhpUnused
      */
     public function login(): string|RedirectResponse
     {
@@ -58,7 +61,7 @@ class Auth extends BaseController
     public function doLogin(): RedirectResponse
     {
         $rules = [
-            'login'    => 'required',
+            'login' => 'required',
             'password' => 'required'
         ];
 
@@ -76,17 +79,29 @@ class Auth extends BaseController
             ->orWhere('username', $login)
             ->first();
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (!$user) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Неверный логин или пароль');
+                ->with('error', 'Пользователь с таким логином не найден');
+        }
+
+        if (!password_verify($password, $user['password'])) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Неверный пароль');
+        }
+
+        // Проверяем, активен ли аккаунт
+        if (!$user['is_active']) {
+            return redirect()->to('login')
+                ->with('warning', 'Ваш email не подтверждён. Проверьте почту. Повторная регистрация будет доступна через 24 часа.');
         }
 
         session()->set([
-            'user_id'       => $user['id'],
-            'username'      => $user['username'],
-            'email'         => $user['email'],
-            'is_logged_in'  => true
+            'user_id' => $user['id'],
+            'username' => $user['username'],
+            'email' => $user['email'],
+            'is_logged_in' => true
         ]);
 
         return redirect()->to('dashboard')
@@ -97,6 +112,7 @@ class Auth extends BaseController
      * Страница регистрации
      *
      * @return string|RedirectResponse
+     * @noinspection PhpUnused
      */
     public function register(): string|RedirectResponse
     {
@@ -116,10 +132,23 @@ class Auth extends BaseController
      */
     public function doRegister(): RedirectResponse
     {
+        // Проверяем, не регистрировался ли этот email недавно
+        $email = $this->request->getPost('email');
+        $lastAttempt = cache("register_attempt_$email");
+
+        if ($lastAttempt) {
+            $timeLeft = 86400 - (time() - $lastAttempt); // 24 часа = 86400 секунд
+            $hoursLeft = ceil($timeLeft / 3600);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Повторная регистрация с этим email будет доступна через $hoursLeft ч. Проверьте почту для активации аккаунта.");
+        }
+
         $rules = [
-            'username'         => 'required|min_length[3]|is_unique[users.username]',
-            'email'            => 'required|valid_email|is_unique[users.email]',
-            'password'         => 'required|min_length[8]',
+            'username' => 'required|min_length[3]|is_unique[users.username]',
+            'email' => 'required|valid_email|is_unique[users.email]',
+            'password' => 'required|min_length[8]',
             'confirm_password' => 'required|matches[password]'
         ];
 
@@ -131,7 +160,7 @@ class Auth extends BaseController
 
         $data = [
             'username' => $this->request->getPost('username'),
-            'email'    => $this->request->getPost('email'),
+            'email' => $email,
             'password' => $this->request->getPost('password')
         ];
 
@@ -141,8 +170,17 @@ class Auth extends BaseController
                 ->with('error', 'Ошибка при создании пользователя');
         }
 
+        // Сохраняем время регистрации в кэш на 24 часа
+        cache()->save("register_attempt_$email", time(), 86400);
+
+        // Получаем созданного пользователя с токеном
+        $user = $this->userModel->where('email', $data['email'])->first();
+
+        // Отправляем письмо с подтверждением
+        sendActivationEmail($user['email'], $user['username'], $user['activation_token']);
+
         return redirect()->to('login')
-            ->with('success', 'Регистрация успешна! Теперь вы можете войти.');
+            ->with('success', 'Регистрация успешна! Проверьте вашу почту для подтверждения email.');
     }
 
     /**
@@ -165,12 +203,18 @@ class Auth extends BaseController
      *
      * @return RedirectResponse
      * @throws RandomException
+     * @throws ReflectionException
      * @noinspection PhpUnused
      */
     public function doForgotPassword(): RedirectResponse
     {
         $rules = [
-            'email' => 'required|valid_email|is_not_unique[users.email]'
+            'email' => [
+                'rules'  => 'required|valid_email|is_not_unique[users.email]',
+                'errors' => [
+                    'is_not_unique' => 'Пользователь с таким email не найден в системе.'
+                ]
+            ]
         ];
 
         if (!$this->validate($rules)) {
@@ -181,14 +225,16 @@ class Auth extends BaseController
 
         $email = $this->request->getPost('email');
 
-        // Генерируем токен для сброса пароля
-        $token = bin2hex(random_bytes(32));
+        // Создаём модель для токенов
+        $passwordResetModel = new PasswordResetModel();
 
-        // TODO: Сохранить токен в БД (создать таблицу password_resets)
-        // TODO: Отправить email со ссылкой для сброса пароля
+        // Создаём токен для сброса пароля
+        $token = $passwordResetModel->createToken($email);
 
-        // Используем переменные для логирования
-        log_message('info', "Password reset requested for email: $email, token: $token");
+        // Отправляем email со ссылкой для сброса пароля
+        sendPasswordResetEmail($email, $token);
+
+        log_message('info', "Password reset requested for email: $email");
 
         return redirect()->back()
             ->with('success', 'Инструкции по восстановлению пароля отправлены на ваш email');
@@ -207,10 +253,14 @@ class Auth extends BaseController
             return redirect()->to('dashboard');
         }
 
-        // TODO: Проверить токен в БД
-        //$isValid = true; // Временно
+        // Проверяем токен через модель
+        $passwordResetModel = new PasswordResetModel();
+        $reset = $passwordResetModel->verifyToken($token);
 
-        // Используем переменную для проверки
+        if (!$reset) {
+            return redirect()->to('forgot-password')
+                ->with('error', 'Недействительная или истекшая ссылка для сброса пароля');
+        }
 
         return view('auth/reset_password', ['token' => $token]);
     }
@@ -220,12 +270,13 @@ class Auth extends BaseController
      *
      * @param string $token Токен сброса пароля
      * @return RedirectResponse
+     * @throws ReflectionException
      * @noinspection PhpUnused
      */
     public function doResetPassword(string $token): RedirectResponse
     {
         $rules = [
-            'password'         => 'required|min_length[8]',
+            'password' => 'required|min_length[8]',
             'confirm_password' => 'required|matches[password]'
         ];
 
@@ -235,8 +286,32 @@ class Auth extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
-        // TODO: Проверить токен в БД и обновить пароль
-        log_message('info', "Password reset using token: $token");
+        // Проверяем токен
+        $passwordResetModel = new PasswordResetModel();
+        $reset = $passwordResetModel->verifyToken($token);
+
+        if (!$reset) {
+            return redirect()->to('forgot-password')
+                ->with('error', 'Недействительная или истекшая ссылка для сброса пароля');
+        }
+
+        // Находим пользователя по email
+        $user = $this->userModel->findByEmail($reset['email']);
+
+        if (!$user) {
+            log_message('error', "User not found for email: {$reset['email']} during password reset");
+            return redirect()->to('login')
+                ->with('error', 'Произошла ошибка. Пожалуйста, попробуйте позже.');
+        }
+
+        // Обновляем пароль
+        $newPassword = $this->request->getPost('password');
+        $this->userModel->updatePassword($user['id'], $newPassword);
+
+        // Удаляем использованный токен
+        $passwordResetModel->deleteToken($token);
+
+        log_message('info', "Password reset completed for user: {$user['username']}");
 
         return redirect()->to('login')
             ->with('success', 'Пароль успешно изменён. Теперь вы можете войти.');

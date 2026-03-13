@@ -38,6 +38,13 @@
                 </div>
             <?php endif; ?>
 
+            <?php if (session()->has('warning')): ?>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><?= session('warning') ?></p>
+                </div>
+            <?php endif; ?>
+
             <form action="<?= base_url('login') ?>" method="POST" id="loginForm">
                 <?= csrf_field() ?>
 

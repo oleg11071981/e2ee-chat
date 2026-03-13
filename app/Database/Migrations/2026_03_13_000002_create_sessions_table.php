@@ -5,20 +5,12 @@ namespace App\Database\Migrations;
 use CodeIgniter\Database\Migration;
 
 /**
- * Миграция для создания таблицы сессий в базе данных
- *
- * Создаёт таблицу ci_sessions для хранения сессий пользователей.
- * Вызывается через CLI командой `php spark migrate`
+ * Создание таблицы для хранения сессий в БД
  *
  * @noinspection PhpUnused
  */
 class CreateSessionsTable extends Migration
 {
-    /**
-     * Создание таблицы сессий
-     *
-     * @return void
-     */
     public function up(): void
     {
         $this->forge->addField([
@@ -50,11 +42,6 @@ class CreateSessionsTable extends Migration
         $this->forge->createTable('ci_sessions');
     }
 
-    /**
-     * Удаление таблицы сессий
-     *
-     * @return void
-     */
     public function down(): void
     {
         $this->forge->dropTable('ci_sessions');

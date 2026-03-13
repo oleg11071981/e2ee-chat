@@ -38,6 +38,17 @@ class Validation extends BaseConfig
         'single' => 'CodeIgniter\Validation\Views\single',
     ];
 
+    /**
+     * Custom validation errors.
+     *
+     * @var array<string, array<string, string>>
+     */
+    public array $customErrors = [
+        'is_not_unique' => [
+            'users.email' => 'Пользователь с таким email не найден в системе.'
+        ]
+    ];
+
     // --------------------------------------------------------------------
     // Rules
     // --------------------------------------------------------------------

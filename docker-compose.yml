@@ -47,23 +47,30 @@ services:
       - e2ee-network
     command: --default-authentication-plugin=mysql_native_password
 
-  ### ===== ДОБАВЛЕН PHPMyADMIN =====
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: e2ee-phpmyadmin
     ports:
-      - "8080:80"  # Будет доступен на http://localhost:8080
+      - "8080:80"
     environment:
-      PMA_HOST: mysql          # Имя сервиса MySQL в сети
+      PMA_HOST: mysql
       PMA_PORT: 3306
-      PMA_USER: root           # Можно зайти как root
-      PMA_PASSWORD: root       # Пароль root из mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
       UPLOAD_LIMIT: 100M
     networks:
       - e2ee-network
     depends_on:
       - mysql
-  ### =================================
+
+  mailhog:  # ← ВАЖНО: теперь внутри services
+    image: mailhog/mailhog
+    container_name: e2ee-mailhog
+    ports:
+      - "1025:1025"  # SMTP порт
+      - "8025:8025"  # Web интерфейс
+    networks:
+      - e2ee-network
 
 volumes:
   mysql_data:

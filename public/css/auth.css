@@ -273,6 +273,17 @@ body.auth-layout {
     border: 1px solid #fc8181;
 }
 
+/* ===== УВЕДОМЛЕНИЕ О НЕАКТИВНОМ АККАУНТЕ ===== */
+.alert-warning {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #fcd34d !important;
+}
+
+.alert-warning i {
+    color: #d97706 !important;
+}
+
 .alert i {
     font-size: 20px;
 }
