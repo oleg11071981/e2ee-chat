@@ -134,19 +134,22 @@ class User extends Model
      */
     protected function hashPassword(array $data): array
     {
+        // Данные могут быть либо в $data['data'], либо прямо в $data
+        $passwordField = null;
+
         if (isset($data['data']['password'])) {
-            $password = $data['data']['password'];
-
-            // Проверяем, не хеширован ли уже пароль
-            // password_get_info возвращает информацию о хеше, если это хеш
-            $info = password_get_info($password);
-
-            // Если алгоритм хеширования не определён (algo = 0), значит это не хеш
-            if ($info['algo'] === 0) {
-                $data['data']['password'] = password_hash($password, PASSWORD_DEFAULT);
-            }
-            // Если algo > 0, значит пароль уже хеширован - оставляем как есть
+            $passwordField = &$data['data']['password'];
+        } elseif (isset($data['password'])) {
+            $passwordField = &$data['password'];
         }
+
+        if ($passwordField !== null) {
+            $info = password_get_info($passwordField);
+            if ($info['algo'] === 0) {
+                $passwordField = password_hash($passwordField, PASSWORD_DEFAULT);
+            }
+        }
+
         return $data;
     }
 
