@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Страница не найдена</title>
+    <title>403 - Доступ запрещён</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,8 @@
 
         :root {
             --primary-color: #667eea;
-            --primary-dark: #5a67d8;
+            --danger-color: #f56565;
+            --danger-dark: #c53030;
             --text-color: #2d3748;
             --text-light: #718096;
             --bg-light: #f7fafc;
@@ -56,9 +57,9 @@
             font-size: 120px;
             font-weight: 700;
             line-height: 1;
-            color: var(--primary-color);
+            color: var(--danger-color);
             margin-bottom: 10px;
-            text-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+            text-shadow: 0 10px 20px rgba(229, 62, 62, 0.2);
         }
 
         .error-title {
@@ -77,7 +78,7 @@
         .divider {
             width: 60px;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), #764ba2);
+            background: linear-gradient(90deg, var(--danger-color), #fc8181);
             margin: 25px auto;
             border-radius: 2px;
         }
@@ -115,19 +116,38 @@
 
         .btn-outline {
             background: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
+            color: var(--danger-color);
+            border: 2px solid var(--danger-color);
         }
 
         .btn-outline:hover {
-            background: var(--primary-color);
+            background: var(--danger-color);
             color: white;
         }
 
-        .icon-404 {
+        .icon-403 {
             font-size: 80px;
-            color: var(--primary-color);
+            color: var(--danger-color);
             margin-bottom: 20px;
+        }
+
+        .warning-note {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 20px;
+            color: #742a2a;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .warning-note i {
+            font-size: 20px;
+            color: var(--danger-color);
         }
 
         @media (max-width: 768px) {
@@ -169,14 +189,14 @@
 </head>
 <body>
 <div class="error-container">
-    <div class="icon-404">
-        <i class="fas fa-compass"></i>
+    <div class="icon-403">
+        <i class="fas fa-shield-halved"></i>
     </div>
-    <div class="error-code">404</div>
-    <h1 class="error-title">Страница не найдена</h1>
+    <div class="error-code">403</div>
+    <h1 class="error-title">Доступ запрещён</h1>
     <div class="error-message">
-        <p>Кажется, вы забрели в неизведанные края.</p>
-        <p>Страница, которую вы ищете, не существует или была перемещена.</p>
+        <p>У вас нет прав для просмотра этой страницы.</p>
+        <p>Это может быть связано с попыткой доступа к системным файлам или папкам.</p>
     </div>
 
     <div class="divider"></div>
@@ -185,15 +205,18 @@
         <a href="<?= base_url('/') ?>" class="btn btn-primary">
             <i class="fas fa-home"></i> На главную
         </a>
-        <a href="javascript:history.back()" class="btn btn-outline">
-            <i class="fas fa-arrow-left"></i> Вернуться назад
+        <a href="<?= base_url('login') ?>" class="btn btn-outline">
+            <i class="fas fa-sign-in-alt"></i> Войти
         </a>
     </div>
 
-    <p style="margin-top: 30px; color: var(--text-light); font-size: 14px;">
-        Если вы уверены, что здесь что-то должно быть,<br>
-        свяжитесь с администратором.
-    </p>
+    <div class="warning-note">
+        <i class="fas fa-circle-exclamation"></i>
+        <div>
+            <strong>Это нормально!</strong> Доступ к системным папкам заблокирован для вашей безопасности.
+            Если вы пытались попасть на реальную страницу, убедитесь, что правильно ввели адрес.
+        </div>
+    </div>
 </div>
 </body>
 </html>

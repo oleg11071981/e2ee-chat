@@ -38,16 +38,26 @@ $routes->get('/dashboard', 'Web\Dashboard::index', ['filter' => 'web-auth']);
 $routes->get('/logout', 'Web\Auth::logout');
 
 // ============================================
-// WEB маршруты (личный кабинет)
+// WEB маршруты (личный кабинет) - временно на заглушку
 // ============================================
-$routes->get('/dashboard/profile', 'Web\Dashboard::profile', ['filter' => 'web-auth']);
-$routes->get('/dashboard/settings', 'Web\Dashboard::settings', ['filter' => 'web-auth']);
-$routes->post('/dashboard/profile/update', 'Web\Dashboard::updateProfile', ['filter' => 'web-auth']);
+// Редактирование профиля - пока в разработке
+$routes->get('/dashboard/profile', 'Web\Placeholder::index/profile', ['filter' => 'web-auth']);
+$routes->post('/dashboard/profile/update', 'Web\Placeholder::index/update-profile', ['filter' => 'web-auth']);
+$routes->get('/dashboard/settings', 'Web\Placeholder::index/settings', ['filter' => 'web-auth']);
 
 // ============================================
 // Активация email
 // ============================================
 $routes->get('activate/(:any)', 'Web\Activation::activate/$1');
+
+// ============================================
+// Заглушки для страниц в разработке
+// ============================================
+$routes->get('/chat', 'Web\Placeholder::chat');
+$routes->get('/contacts', 'Web\Placeholder::contacts');
+$routes->get('/security', 'Web\Placeholder::security');
+$routes->get('/profile', 'Web\Placeholder::index/profile');
+$routes->get('/help', 'Web\Placeholder::index/help');
 
 // ============================================
 // Повторная отправка письма активации (УДАЛЕНА)

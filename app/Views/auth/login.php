@@ -75,12 +75,12 @@
                     <div class="error-message" id="passwordError"></div>
                 </div>
 
-                <div class="checkbox-group">
+                <!--div class="checkbox-group">
                     <label class="checkbox-label">
                         <input type="checkbox" name="remember" value="1">
                         <span>Запомнить меня</span>
                     </label>
-                </div>
+                </div-->
 
                 <button type="submit" class="btn btn-primary" id="submitBtn">
                     <span>Войти</span>
