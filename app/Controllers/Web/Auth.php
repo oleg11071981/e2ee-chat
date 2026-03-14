@@ -163,8 +163,8 @@ class Auth extends BaseController
 
         $data = [
             'username' => $this->request->getPost('username'),
-            'email' => $email,
-            'password' => $this->request->getPost('password')
+            'email'    => $email,
+            'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT)
         ];
 
         if (!$this->userModel->save($data)) {
