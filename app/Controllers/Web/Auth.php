@@ -134,7 +134,10 @@ class Auth extends BaseController
     {
         // Проверяем, не регистрировался ли этот email недавно
         $email = $this->request->getPost('email');
-        $lastAttempt = cache("register_attempt_$email");
+
+        // Создаём безопасный ключ для кэша (заменяем @ на _)
+        $cacheKey = "register_attempt_" . str_replace('@', '_', $email);
+        $lastAttempt = cache($cacheKey);
 
         if ($lastAttempt) {
             $timeLeft = 86400 - (time() - $lastAttempt); // 24 часа = 86400 секунд
@@ -170,8 +173,8 @@ class Auth extends BaseController
                 ->with('error', 'Ошибка при создании пользователя');
         }
 
-        // Сохраняем время регистрации в кэш на 24 часа
-        cache()->save("register_attempt_$email", time(), 86400);
+        // Сохраняем время регистрации в кэш на 24 часа (используем безопасный ключ)
+        cache()->save($cacheKey, time(), 86400);
 
         // Получаем созданного пользователя с токеном
         $user = $this->userModel->where('email', $data['email'])->first();
