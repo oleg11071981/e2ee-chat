@@ -8,7 +8,10 @@
     <!-- Базовые стили -->
     <link rel="stylesheet" href="<?= base_url('css/style.css') ?>">
 
-    <!-- Дополнительные стили для конкретной страницы -->
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Дополнительные стили для страницы -->
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
@@ -16,20 +19,29 @@
 <header class="header">
     <div class="container">
         <div class="logo">
-            <a href="<?= base_url('/') ?>">🔐 E2EE Чат</a>
+            <a href="<?= base_url('/') ?>">
+                <span class="logo-icon">🔐</span>
+                <span class="logo-text">E2EE Чат</span>
+            </a>
         </div>
 
-        <?php if (session()->has('is_logged_in')): ?>
-            <nav class="nav">
+        <!-- Кнопка бургер для мобильных -->
+        <button class="burger-menu" id="burgerMenu" aria-label="Меню">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Навигация -->
+        <nav class="nav" id="mainNav">
+            <?php if (session()->has('is_logged_in')): ?>
                 <a href="<?= base_url('dashboard') ?>">Личный кабинет</a>
                 <a href="<?= base_url('logout') ?>" class="btn-logout">Выйти</a>
-            </nav>
-        <?php else: ?>
-            <nav class="nav">
+            <?php else: ?>
                 <a href="<?= base_url('login') ?>">Вход</a>
                 <a href="<?= base_url('register') ?>">Регистрация</a>
-            </nav>
-        <?php endif; ?>
+            <?php endif; ?>
+        </nav>
     </div>
 </header>
 
@@ -49,6 +61,7 @@
 
 <!-- Базовые скрипты -->
 <script src="<?= base_url('js/api.js') ?>"></script>
+<script src="<?= base_url('js/menu.js') ?>"></script>
 
 <!-- Дополнительные скрипты для страницы -->
 <?= $this->renderSection('scripts') ?>
