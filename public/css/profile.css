@@ -1,0 +1,131 @@
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.profile-header h1 {
+    font-size: 28px;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.profile-info {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-group {
+    margin-bottom: 20px;
+}
+
+.info-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.info-group input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f7fafc;
+    color: #718096;
+    font-size: 16px;
+}
+
+.info-group input:disabled {
+    background: #edf2f7;
+    cursor: not-allowed;
+}
+
+.profile-form {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-form h2 {
+    font-size: 20px;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+/* ===== УВЕДОМЛЕНИЯ ===== */
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    animation: slideDown 0.4s ease;
+}
+
+.alert-success {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+    background: #c6f6d5;
+    color: #22543d;
+    border: 1px solid #9ae6b4;
+}
+
+.alert-success i {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.alert-success p {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.alert-danger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #fc8181;
+}
+
+.alert-danger i {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.alert-danger p {
+    margin: 0;
+}
+
+/* Мобильная версия */
+@media (max-width: 480px) {
+    .alert-success p {
+        white-space: normal; /* На мобильных разрешаем перенос */
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

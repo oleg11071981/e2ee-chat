@@ -53,6 +53,7 @@ class User extends Model
      */
     protected $allowedFields = [
         'username',          // Имя пользователя (уникальное)
+        'display_name',      // Имя пользователя в чатах
         'email',             // Email (уникальный)
         'password',          // Хеш пароля
         'is_active',         // Статус активации (0/1)

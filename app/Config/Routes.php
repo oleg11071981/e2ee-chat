@@ -41,8 +41,8 @@ $routes->get('/logout', 'Web\Auth::logout');
 // WEB маршруты (личный кабинет) - временно на заглушку
 // ============================================
 // Редактирование профиля - пока в разработке
-$routes->get('/dashboard/profile', 'Web\Placeholder::index/profile', ['filter' => 'web-auth']);
-$routes->post('/dashboard/profile/update', 'Web\Placeholder::index/update-profile', ['filter' => 'web-auth']);
+//$routes->get('/dashboard/profile', 'Web\Placeholder::index/profile', ['filter' => 'web-auth']);
+//$routes->post('/dashboard/profile/update', 'Web\Placeholder::index/update-profile', ['filter' => 'web-auth']);
 $routes->get('/dashboard/settings', 'Web\Placeholder::index/settings', ['filter' => 'web-auth']);
 
 // ============================================
@@ -56,8 +56,14 @@ $routes->get('activate/(:any)', 'Web\Activation::activate/$1');
 $routes->get('/chat', 'Web\Placeholder::chat');
 $routes->get('/contacts', 'Web\Placeholder::contacts');
 $routes->get('/security', 'Web\Placeholder::security');
-$routes->get('/profile', 'Web\Placeholder::index/profile');
+//$routes->get('/profile', 'Web\Placeholder::index/profile');
 $routes->get('/help', 'Web\Placeholder::index/help');
+
+// ============================================
+// Профиль пользователя
+// ============================================
+$routes->get('/dashboard/profile', 'Web\Profile::index', ['filter' => 'web-auth']);
+$routes->post('/dashboard/profile/update-name', 'Web\Profile::updateDisplayName', ['filter' => 'web-auth']);
 
 // ============================================
 // Повторная отправка письма активации (УДАЛЕНА)
