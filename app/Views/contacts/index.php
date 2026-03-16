@@ -55,13 +55,12 @@
                 <?php foreach ($contacts as $contact): ?>
                     <div class="contact-card <?= $contact['is_active'] ? 'active' : 'inactive' ?>">
                         <div class="contact-avatar">
-                            <?php if ($contact['display_name'] ?? ''): ?>
-                                <span class="avatar-initials">
-                                    <?= strtoupper(substr($contact['display_name'] ?? $contact['username'], 0, 1)) ?>
-                                </span>
-                            <?php else: ?>
-                                <i class="fas fa-user-circle"></i>
-                            <?php endif; ?>
+                            <?php
+                            // Берём первые две буквы из display_name или username
+                            $name = $contact['display_name'] ?? $contact['username'];
+                            $initials = strtoupper(mb_substr($name, 0, 2, 'UTF-8'));
+                            ?>
+                            <span class="avatar-initials"><?= $initials ?></span>
                         </div>
 
                         <div class="contact-info">
