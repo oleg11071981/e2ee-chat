@@ -35,7 +35,6 @@
         <!-- Навигация -->
         <nav class="nav" id="mainNav">
             <?php if (session()->has('is_logged_in')): ?>
-                <a href="<?= base_url('dashboard') ?>">Личный кабинет</a>
                 <a href="<?= base_url('logout') ?>" class="btn-logout">Выйти</a>
             <?php else: ?>
                 <a href="<?= base_url('login') ?>">Вход</a>

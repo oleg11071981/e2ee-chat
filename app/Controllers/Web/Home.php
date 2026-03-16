@@ -3,6 +3,7 @@
 namespace App\Controllers\Web;
 
 use App\Controllers\BaseController;
+use CodeIgniter\HTTP\RedirectResponse;
 
 /**
  * Главная страница
@@ -13,11 +14,17 @@ class Home extends BaseController
 {
     /**
      * Отображает главную страницу
+     * Если пользователь авторизован - редирект в личный кабинет
      *
-     * @return string
+     * @return string|RedirectResponse
      */
-    public function index(): string
+    public function index(): string|RedirectResponse
     {
+        // Если пользователь авторизован - сразу в личный кабинет
+        if (session()->get('is_logged_in')) {
+            return redirect()->to('dashboard');
+        }
+
         return view('web/home');
     }
 }
