@@ -74,13 +74,12 @@
                         <?php foreach ($users as $user): ?>
                             <div class="user-card <?= $user['is_active'] ? 'active' : 'inactive' ?>">
                                 <div class="user-avatar">
-                                    <?php if ($user['display_name'] ?? ''): ?>
-                                        <span class="avatar-initials">
-                                            <?= strtoupper(substr($user['display_name'] ?? $user['username'], 0, 1)) ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <i class="fas fa-user"></i>
-                                    <?php endif; ?>
+                                    <?php
+                                    // Берём первые две буквы из display_name или username
+                                    $name = $user['display_name'] ?? $user['username'];
+                                    $initials = strtoupper(mb_substr($name, 0, 2, 'UTF-8'));
+                                    ?>
+                                    <span class="avatar-initials"><?= $initials ?></span>
                                 </div>
 
                                 <div class="user-info">
