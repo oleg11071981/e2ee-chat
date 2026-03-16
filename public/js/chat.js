@@ -31,15 +31,14 @@ class ChatPoller {
         this.onStatusChangeCallback = options.onStatusChange || null;
 
         /** @type {number} */
-        this.pollInterval = 0; // 0 = сразу после ответа
+        this.pollInterval = 0;
 
         /** @type {number} */
-        this.errorRetryDelay = 5000; // 5 секунд при ошибке
+        this.errorRetryDelay = 5000;
 
-        /** @type {string|null} */
-        this.token = localStorage.getItem('access_token');
+        // Для веб-версии токен не нужен - используется сессия
+        this.token = null;
 
-        // Запускаем polling
         this.startPolling().catch(error => {
             console.error('Polling failed to start:', error);
         });
@@ -74,7 +73,6 @@ class ChatPoller {
     async poll() {
         const response = await fetch(`/api/chat/poll?last_id=${this.lastId}`, {
             headers: {
-                'Authorization': `Bearer ${this.token}`,
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
@@ -110,7 +108,6 @@ class ChatPoller {
         const response = await fetch('/api/chat/send', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${this.token}`,
                 'X-Requested-With': 'XMLHttpRequest'
             },
             body: formData
@@ -135,7 +132,6 @@ class ChatPoller {
     async loadHistory(limit = 50) {
         const response = await fetch(`/api/chat/history/${this.contactId}?limit=${limit}`, {
             headers: {
-                'Authorization': `Bearer ${this.token}`,
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
@@ -165,7 +161,6 @@ class ChatPoller {
         const response = await fetch(`/api/chat/read/${messageId}`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${this.token}`,
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/json'
             }
@@ -181,7 +176,6 @@ class ChatPoller {
     async getUnreadCount() {
         const response = await fetch('/api/chat/unread-count', {
             headers: {
-                'Authorization': `Bearer ${this.token}`,
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });

@@ -29,6 +29,14 @@ class ChatController extends ResourceController
     }
 
     /**
+     * Получение ID пользователя из сессии
+     */
+    protected function getUserId(): ?int
+    {
+        return session()->get('user_id') ?: null;
+    }
+
+    /**
      * Long Polling для получения новых сообщений
      * GET /api/chat/poll
      * @throws ReflectionException
@@ -36,14 +44,14 @@ class ChatController extends ResourceController
      */
     public function poll(): ResponseInterface
     {
-        $userId = $this->request->user->user_id ?? null;
+        $userId = $this->getUserId();
 
         if (!$userId) {
             return $this->failUnauthorized('Требуется авторизация');
         }
 
         $lastId = (int)($this->request->getGet('last_id') ?? 0);
-        $timeout = 25; // ждём до 25 секунд (с запасом до тайм-аута PHP)
+        $timeout = 25;
         $start = time();
 
         // Закрываем сессию, чтобы не блокировать другие запросы
@@ -71,11 +79,9 @@ class ChatController extends ResourceController
                 ]);
             }
 
-            // Ждём 1 секунду перед следующей проверкой
             sleep(1);
         }
 
-        // Тайм-аут — возвращаем пустой массив
         return $this->respond([
             'status' => 'success',
             'data' => [
@@ -91,7 +97,7 @@ class ChatController extends ResourceController
      */
     public function send(): ResponseInterface
     {
-        $userId = $this->request->user->user_id ?? null;
+        $userId = $this->getUserId();
 
         if (!$userId) {
             return $this->failUnauthorized('Требуется авторизация');
@@ -117,7 +123,7 @@ class ChatController extends ResourceController
             return $this->failNotFound('Получатель не найден');
         }
 
-        // Проверяем, что это контакт (опционально)
+        // Проверяем, что это контакт
         $isContact = $this->contactModel->isContact($userId, $recipientId);
         if (!$isContact) {
             return $this->fail('Можно отправлять сообщения только контактам', 403);
@@ -153,7 +159,7 @@ class ChatController extends ResourceController
      */
     public function history($contactId = null): ResponseInterface
     {
-        $userId = $this->request->user->user_id ?? null;
+        $userId = $this->getUserId();
 
         if (!$userId) {
             return $this->failUnauthorized('Требуется авторизация');
@@ -166,14 +172,14 @@ class ChatController extends ResourceController
         }
 
         $limit = (int)($this->request->getGet('limit') ?? 50);
-        $limit = min($limit, 100); // не больше 100 сообщений
+        $limit = min($limit, 100);
 
         $messages = $this->messageModel->getConversation($userId, $contactId, $limit);
 
         return $this->respond([
             'status' => 'success',
             'data' => [
-                'messages' => array_reverse($messages), // от старых к новым
+                'messages' => array_reverse($messages),
                 'count' => count($messages)
             ]
         ]);
@@ -186,7 +192,7 @@ class ChatController extends ResourceController
      */
     public function markRead($messageId = null): ResponseInterface
     {
-        $userId = $this->request->user->user_id ?? null;
+        $userId = $this->getUserId();
 
         if (!$userId) {
             return $this->failUnauthorized('Требуется авторизация');
@@ -198,7 +204,6 @@ class ChatController extends ResourceController
             return $this->failValidationErrors('Некорректный ID сообщения');
         }
 
-        // Проверяем, что сообщение адресовано текущему пользователю
         $message = $this->messageModel->find($messageId);
 
         if (!$message) {
@@ -229,7 +234,7 @@ class ChatController extends ResourceController
      */
     public function unreadCount(): ResponseInterface
     {
-        $userId = $this->request->user->user_id ?? null;
+        $userId = $this->getUserId();
 
         if (!$userId) {
             return $this->failUnauthorized('Требуется авторизация');

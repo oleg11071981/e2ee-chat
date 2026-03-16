@@ -21,20 +21,20 @@ $routes->group('api', function($routes) {
     $routes->group('', ['filter' => 'jwt'], function($routes) {
         $routes->get('profile', 'Api\AuthController::profile');
 
-        // API для контактов (JWT)
+        // API для контактов (JWT) - оставляем с JWT
         $routes->get('contacts', 'Api\ContactsController::index');
         $routes->get('contacts/search', 'Api\ContactsController::search');
         $routes->post('contacts/add', 'Api\ContactsController::add');
         $routes->delete('contacts/remove/(:num)', 'Api\ContactsController::remove/$1');
         $routes->get('contacts/check/(:num)', 'Api\ContactsController::check/$1');
-
-        // API для чата (Long Polling)
-        $routes->get('chat/poll', 'Api\ChatController::poll');
-        $routes->post('chat/send', 'Api\ChatController::send');
-        $routes->get('chat/history/(:num)', 'Api\ChatController::history/$1');
-        $routes->post('chat/read/(:num)', 'Api\ChatController::markRead/$1');
-        $routes->get('chat/unread-count', 'Api\ChatController::unreadCount');
     });
+
+    // API для чата (без JWT, используют сессии)
+    $routes->get('chat/poll', 'Api\ChatController::poll');
+    $routes->post('chat/send', 'Api\ChatController::send');
+    $routes->get('chat/history/(:num)', 'Api\ChatController::history/$1');
+    $routes->post('chat/read/(:num)', 'Api\ChatController::markRead/$1');
+    $routes->get('chat/unread-count', 'Api\ChatController::unreadCount');
 });
 
 // ============================================
@@ -54,8 +54,6 @@ $routes->get('/logout', 'Web\Auth::logout');
 // ============================================
 // WEB маршруты (личный кабинет)
 // ============================================
-//$routes->get('/dashboard/profile', 'Web\Placeholder::index/profile', ['filter' => 'web-auth']);
-//$routes->post('/dashboard/profile/update', 'Web\Placeholder::index/update-profile', ['filter' => 'web-auth']);
 $routes->get('/dashboard/settings', 'Web\Placeholder::index/settings', ['filter' => 'web-auth']);
 
 // ============================================
@@ -71,6 +69,13 @@ $routes->get('/contacts', 'Web\Contacts::index', ['filter' => 'web-auth']);
 $routes->get('/contacts/search', 'Web\Contacts::search', ['filter' => 'web-auth']);
 $routes->post('/contacts/add', 'Web\Contacts::add', ['filter' => 'web-auth']);
 $routes->post('/contacts/remove/(:num)', 'Web\Contacts::remove/$1', ['filter' => 'web-auth']);
+$routes->get('/contacts/get-for-chat', 'Web\Contacts::getForChat', ['filter' => 'web-auth']);
+
+// ============================================
+// Чат (WEB)
+// ============================================
+$routes->get('/chat', 'Web\Chat::index', ['filter' => 'web-auth']);
+$routes->get('/chat/(:num)', 'Web\Chat::conversation/$1', ['filter' => 'web-auth']);
 
 // ============================================
 // Активация email
@@ -80,25 +85,5 @@ $routes->get('activate/(:any)', 'Web\Activation::activate/$1');
 // ============================================
 // Заглушки для страниц в разработке
 // ============================================
-//$routes->get('/chat', 'Web\Placeholder::chat');
-//$routes->get('/chat/(:any)', 'Web\Placeholder::index/$1');      // Для вложенных URL
-//$routes->get('/contacts', 'Web\Placeholder::contacts');        // ЗАКОММЕНТИРОВАНО (теперь реальный контроллер)
 $routes->get('/security', 'Web\Placeholder::security');
-//$routes->get('/profile', 'Web\Placeholder::index/profile');
 $routes->get('/help', 'Web\Placeholder::index/help');
-
-// ============================================
-// Чат (WEB)
-// ============================================
-$routes->get('/chat', 'Web\Chat::index', ['filter' => 'web-auth']);
-$routes->get('/chat/(:num)', 'Web\Chat::conversation/$1', ['filter' => 'web-auth']);
-
-// ============================================
-// Контакты (WEB) - дополнительный маршрут для AJAX
-// ============================================
-$routes->get('/contacts/get-for-chat', 'Web\Contacts::getForChat', ['filter' => 'web-auth']);
-
-// ============================================
-// Повторная отправка письма активации (УДАЛЕНА)
-// ============================================
-// $routes->post('resend-activation', 'Web\Activation::resend');
