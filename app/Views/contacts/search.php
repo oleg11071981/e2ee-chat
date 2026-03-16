@@ -92,9 +92,6 @@
                                     <div class="user-detail">
                                         <i class="fas fa-at"></i> <?= esc($user['username']) ?>
                                     </div>
-                                    <div class="user-detail">
-                                        <i class="fas fa-envelope"></i> <?= esc($user['email']) ?>
-                                    </div>
                                 </div>
 
                                 <div class="user-actions">
