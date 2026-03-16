@@ -20,6 +20,13 @@ $routes->group('api', function($routes) {
 
     $routes->group('', ['filter' => 'jwt'], function($routes) {
         $routes->get('profile', 'Api\AuthController::profile');
+
+        // API для контактов (JWT)
+        $routes->get('contacts', 'Api\ContactsController::index');
+        $routes->get('contacts/search', 'Api\ContactsController::search');
+        $routes->post('contacts/add', 'Api\ContactsController::add');
+        $routes->delete('contacts/remove/(:num)', 'Api\ContactsController::remove/$1');
+        $routes->get('contacts/check/(:num)', 'Api\ContactsController::check/$1');
     });
 });
 
@@ -38,12 +45,25 @@ $routes->get('/dashboard', 'Web\Dashboard::index', ['filter' => 'web-auth']);
 $routes->get('/logout', 'Web\Auth::logout');
 
 // ============================================
-// WEB маршруты (личный кабинет) - временно на заглушку
+// WEB маршруты (личный кабинет)
 // ============================================
-// Редактирование профиля - пока в разработке
 //$routes->get('/dashboard/profile', 'Web\Placeholder::index/profile', ['filter' => 'web-auth']);
 //$routes->post('/dashboard/profile/update', 'Web\Placeholder::index/update-profile', ['filter' => 'web-auth']);
 $routes->get('/dashboard/settings', 'Web\Placeholder::index/settings', ['filter' => 'web-auth']);
+
+// ============================================
+// Профиль пользователя
+// ============================================
+$routes->get('/dashboard/profile', 'Web\Profile::index', ['filter' => 'web-auth']);
+$routes->post('/dashboard/profile/update-name', 'Web\Profile::updateDisplayName', ['filter' => 'web-auth']);
+
+// ============================================
+// Контакты (WEB)
+// ============================================
+$routes->get('/contacts', 'Web\Contacts::index', ['filter' => 'web-auth']);
+$routes->get('/contacts/search', 'Web\Contacts::search', ['filter' => 'web-auth']);
+$routes->post('/contacts/add', 'Web\Contacts::add', ['filter' => 'web-auth']);
+$routes->post('/contacts/remove/(:num)', 'Web\Contacts::remove/$1', ['filter' => 'web-auth']);
 
 // ============================================
 // Активация email
@@ -54,16 +74,10 @@ $routes->get('activate/(:any)', 'Web\Activation::activate/$1');
 // Заглушки для страниц в разработке
 // ============================================
 $routes->get('/chat', 'Web\Placeholder::chat');
-$routes->get('/contacts', 'Web\Placeholder::contacts');
+//$routes->get('/contacts', 'Web\Placeholder::contacts');  // ЗАКОММЕНТИРОВАНО (теперь реальный контроллер)
 $routes->get('/security', 'Web\Placeholder::security');
 //$routes->get('/profile', 'Web\Placeholder::index/profile');
 $routes->get('/help', 'Web\Placeholder::index/help');
-
-// ============================================
-// Профиль пользователя
-// ============================================
-$routes->get('/dashboard/profile', 'Web\Profile::index', ['filter' => 'web-auth']);
-$routes->post('/dashboard/profile/update-name', 'Web\Profile::updateDisplayName', ['filter' => 'web-auth']);
 
 // ============================================
 // Повторная отправка письма активации (УДАЛЕНА)
