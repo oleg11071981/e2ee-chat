@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\User;
 use App\Models\Contact;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
 use ReflectionException;
 
 /**
@@ -67,7 +68,7 @@ class Contacts extends BaseController
             // Ищем пользователей по имени или email
             $users = $this->userModel
                 ->select('id, username, email, display_name, is_active')
-                ->where('id !=', $userId) // Исключаем себя
+                ->where('id !=', $userId)
                 ->groupStart()
                 ->like('username', $query)
                 ->orLike('email', $query)
@@ -147,5 +148,26 @@ class Contacts extends BaseController
 
         return redirect()->to('contacts')
             ->with('error', 'Не удалось удалить контакт');
+    }
+
+    /**
+     * Получение списка контактов для чата (JSON)
+     *
+     * @return ResponseInterface
+     * @noinspection PhpUnused
+     */
+    public function getForChat(): ResponseInterface
+    {
+        if (!session()->get('is_logged_in')) {
+            return $this->response->setJSON(['error' => 'Unauthorized'])->setStatusCode(401);
+        }
+
+        $userId = session()->get('user_id');
+        $contacts = $this->contactModel->getContacts($userId);
+
+        return $this->response->setJSON([
+            'success' => true,
+            'contacts' => $contacts
+        ]);
     }
 }

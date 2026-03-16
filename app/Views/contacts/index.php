@@ -56,7 +56,6 @@
                     <div class="contact-card <?= $contact['is_active'] ? 'active' : 'inactive' ?>">
                         <div class="contact-avatar">
                             <?php
-                            // Берём первые две буквы из display_name или username
                             $name = $contact['display_name'] ?? $contact['username'];
                             $initials = strtoupper(mb_substr($name, 0, 2, 'UTF-8'));
                             ?>
@@ -75,7 +74,7 @@
                         </div>
 
                         <div class="contact-actions">
-                            <a href="<?= base_url('chat/start/' . $contact['id']) ?>"
+                            <a href="<?= base_url('chat/' . $contact['id']) ?>"
                                class="btn btn-primary btn-icon"
                                title="Написать сообщение">
                                 <i class="fas fa-comment"></i>

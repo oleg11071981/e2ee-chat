@@ -27,6 +27,13 @@ $routes->group('api', function($routes) {
         $routes->post('contacts/add', 'Api\ContactsController::add');
         $routes->delete('contacts/remove/(:num)', 'Api\ContactsController::remove/$1');
         $routes->get('contacts/check/(:num)', 'Api\ContactsController::check/$1');
+
+        // API для чата (Long Polling)
+        $routes->get('chat/poll', 'Api\ChatController::poll');
+        $routes->post('chat/send', 'Api\ChatController::send');
+        $routes->get('chat/history/(:num)', 'Api\ChatController::history/$1');
+        $routes->post('chat/read/(:num)', 'Api\ChatController::markRead/$1');
+        $routes->get('chat/unread-count', 'Api\ChatController::unreadCount');
     });
 });
 
@@ -73,12 +80,23 @@ $routes->get('activate/(:any)', 'Web\Activation::activate/$1');
 // ============================================
 // Заглушки для страниц в разработке
 // ============================================
-$routes->get('/chat', 'Web\Placeholder::chat');
-$routes->get('/chat/(:any)', 'Web\Placeholder::index/$1');      // Добавлено для вложенных URL
+//$routes->get('/chat', 'Web\Placeholder::chat');
+//$routes->get('/chat/(:any)', 'Web\Placeholder::index/$1');      // Для вложенных URL
 //$routes->get('/contacts', 'Web\Placeholder::contacts');        // ЗАКОММЕНТИРОВАНО (теперь реальный контроллер)
 $routes->get('/security', 'Web\Placeholder::security');
 //$routes->get('/profile', 'Web\Placeholder::index/profile');
 $routes->get('/help', 'Web\Placeholder::index/help');
+
+// ============================================
+// Чат (WEB)
+// ============================================
+$routes->get('/chat', 'Web\Chat::index', ['filter' => 'web-auth']);
+$routes->get('/chat/(:num)', 'Web\Chat::conversation/$1', ['filter' => 'web-auth']);
+
+// ============================================
+// Контакты (WEB) - дополнительный маршрут для AJAX
+// ============================================
+$routes->get('/contacts/get-for-chat', 'Web\Contacts::getForChat', ['filter' => 'web-auth']);
 
 // ============================================
 // Повторная отправка письма активации (УДАЛЕНА)
