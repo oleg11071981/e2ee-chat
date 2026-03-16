@@ -41,6 +41,17 @@
     align-items: center;
 }
 
+.search-form .btn {
+    height: 48px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    box-sizing: border-box;
+    margin: 0;
+}
+
 .search-wrapper {
     flex: 1;
     position: relative;
@@ -58,12 +69,14 @@
 
 .search-input {
     width: 100%;
-    padding: 12px 16px 12px 45px;
+    height: 48px;
+    padding: 0 16px 0 45px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
     transition: all 0.3s;
     background: white;
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -309,6 +322,10 @@
     display: inline;
 }
 
+.add-contact-form {
+    display: inline;
+}
+
 /* Пустые состояния */
 .no-contacts,
 .no-results {
@@ -341,6 +358,41 @@
 .small {
     font-size: 14px;
     color: var(--text-light);
+}
+
+/* Уведомления */
+.alert {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-success {
+    background: #c6f6d5;
+    color: #22543d;
+    border: 1px solid #9ae6b4;
+}
+
+.alert-danger {
+    background: #fed7d7;
+    color: #742a2a;
+    border: 1px solid #fc8181;
+}
+
+.alert i {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.alert p,
+.alert span {
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ===== АДАПТИВНОСТЬ ===== */
@@ -399,6 +451,11 @@
     .contact-actions {
         width: 100%;
         justify-content: center;
+    }
+
+    .alert p,
+    .alert span {
+        white-space: normal;
     }
 }
 

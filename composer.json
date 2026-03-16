@@ -6,7 +6,8 @@
     "require": {
         "php": "^8.4",
         "codeigniter4/framework": "^4.7",
-        "firebase/php-jwt": "6.4.0"
+        "firebase/php-jwt": "6.4.0",
+      "ext-mbstring": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",

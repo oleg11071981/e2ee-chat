@@ -33,7 +33,7 @@
         <?php if (session()->has('success')): ?>
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i>
-                <p><?= session('success') ?></p>
+                <span><?= session('success') ?></span>
             </div>
         <?php endif; ?>
 
@@ -72,14 +72,6 @@
                                     <span class="offline-indicator" title="Офлайн"></span>
                                 <?php endif; ?>
                             </div>
-                            <div class="contact-detail">
-                                <i class="fas fa-at"></i> <?= esc($contact['username']) ?>
-                            </div>
-                            <?php if (!empty($contact['display_name'])): ?>
-                                <div class="contact-detail display-name">
-                                    <i class="fas fa-tag"></i> <?= esc($contact['display_name']) ?>
-                                </div>
-                            <?php endif; ?>
                         </div>
 
                         <div class="contact-actions">

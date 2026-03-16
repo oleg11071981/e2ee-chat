@@ -30,7 +30,7 @@
         <?php if (session()->has('success')): ?>
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i>
-                <p><?= session('success') ?></p>
+                <span><?= session('success') ?></span>
             </div>
         <?php endif; ?>
 
@@ -103,7 +103,7 @@
                                             <i class="fas fa-check"></i> В контактах
                                         </span>
                                     <?php elseif ($user['is_active']): ?>
-                                        <form action="<?= base_url('contacts/add') ?>" method="POST">
+                                        <form action="<?= base_url('contacts/add') ?>" method="POST" class="add-contact-form">
                                             <?= csrf_field() ?>
                                             <input type="hidden" name="contact_id" value="<?= $user['id'] ?>">
                                             <button type="submit" class="btn btn-primary">

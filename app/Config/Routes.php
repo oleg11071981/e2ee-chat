@@ -74,7 +74,8 @@ $routes->get('activate/(:any)', 'Web\Activation::activate/$1');
 // Заглушки для страниц в разработке
 // ============================================
 $routes->get('/chat', 'Web\Placeholder::chat');
-//$routes->get('/contacts', 'Web\Placeholder::contacts');  // ЗАКОММЕНТИРОВАНО (теперь реальный контроллер)
+$routes->get('/chat/(:any)', 'Web\Placeholder::index/$1');      // Добавлено для вложенных URL
+//$routes->get('/contacts', 'Web\Placeholder::contacts');        // ЗАКОММЕНТИРОВАНО (теперь реальный контроллер)
 $routes->get('/security', 'Web\Placeholder::security');
 //$routes->get('/profile', 'Web\Placeholder::index/profile');
 $routes->get('/help', 'Web\Placeholder::index/help');

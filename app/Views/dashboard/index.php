@@ -34,7 +34,7 @@
                 <div class="stat-icon">👥</div>
                 <div class="stat-content">
                     <span class="stat-label">Контактов</span>
-                    <span class="stat-value">0</span>
+                    <span class="stat-value"><?= $contactCount ?? 0 ?></span>
                 </div>
             </div>
             <div class="stat-card">
@@ -50,26 +50,32 @@
         <div class="actions-section">
             <h2>Быстрые действия</h2>
             <div class="actions-grid">
-                <a href="<?= base_url('chat') ?>" class="action-card">
-                    <div class="action-icon">💬</div>
-                    <h3>Начать чат</h3>
-                    <p>Напишите новое сообщение</p>
-                </a>
+                <!-- Контакты -->
                 <a href="<?= base_url('contacts') ?>" class="action-card">
                     <div class="action-icon">👥</div>
                     <h3>Контакты</h3>
                     <p>Управление списком контактов</p>
                 </a>
+
+                <!-- Профиль -->
                 <a href="<?= base_url('dashboard/profile') ?>" class="action-card">
                     <div class="action-icon">⚙️</div>
-                    <h3>Настройки</h3>
-                    <p>Редактировать профиль</p>
+                    <h3>Профиль</h3>
+                    <p>Настройки отображаемого имени</p>
                 </a>
-                <a href="<?= base_url('security') ?>" class="action-card">
+
+                <!-- Заглушки для нерабочих страниц -->
+                <div class="action-card" style="opacity: 0.7; cursor: default;">
+                    <div class="action-icon">💬</div>
+                    <h3>Чат (в разработке)</h3>
+                    <p>Скоро будет доступен</p>
+                </div>
+
+                <div class="action-card" style="opacity: 0.7; cursor: default;">
                     <div class="action-icon">🛡️</div>
                     <h3>Безопасность</h3>
-                    <p>Настройки шифрования</p>
-                </a>
+                    <p>В разработке</p>
+                </div>
             </div>
         </div>
 

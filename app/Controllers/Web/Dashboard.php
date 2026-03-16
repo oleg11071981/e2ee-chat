@@ -4,44 +4,37 @@ namespace App\Controllers\Web;
 
 use App\Controllers\BaseController;
 use App\Models\User;
+use App\Models\Contact;
 use CodeIgniter\HTTP\RedirectResponse;
 use ReflectionException;
 
 /**
  * Контроллер личного кабинета
  *
- * Отображает страницу после успешной авторизации.
- * Содержит информацию о пользователе и навигацию по чату.
- *
  * @package App\Controllers\Web
+ * @noinspection PhpUnused
  */
 class Dashboard extends BaseController
 {
-    /**
-     * Модель пользователя
-     *
-     * @var User
-     */
     protected User $userModel;
+    protected Contact $contactModel;
 
-    /**
-     * Конструктор контроллера
-     */
     public function __construct()
     {
         $this->userModel = new User();
+        $this->contactModel = new Contact();
     }
 
     /**
      * Главная страница личного кабинета
      *
      * @return string|RedirectResponse
+     * @noinspection PhpUnused
      */
     public function index(): string|RedirectResponse
     {
-        // Проверяем, авторизован ли пользователь
         if (!session()->get('is_logged_in')) {
-            return redirect()->to('/login')
+            return redirect()->to('login')
                 ->with('error', 'Пожалуйста, войдите в систему');
         }
 
@@ -50,12 +43,16 @@ class Dashboard extends BaseController
 
         if (!$user) {
             session()->destroy();
-            return redirect()->to('/login')
+            return redirect()->to('login')
                 ->with('error', 'Пользователь не найден');
         }
 
+        // Получаем количество контактов
+        $contactCount = $this->contactModel->getContactCount($userId);
+
         $data = [
-            'user' => $user
+            'user' => $user,
+            'contactCount' => $contactCount
         ];
 
         return view('dashboard/index', $data);
@@ -70,14 +67,14 @@ class Dashboard extends BaseController
     public function profile(): string|RedirectResponse
     {
         if (!session()->get('is_logged_in')) {
-            return redirect()->to('/login');
+            return redirect()->to('login');
         }
 
         $userId = session()->get('user_id');
-        $user = $this->userModel->select('id, username, email, created_at')->find($userId);
+        $user = $this->userModel->select('id, username, email, display_name, created_at')->find($userId);
 
         if (!$user) {
-            return redirect()->to('/dashboard')
+            return redirect()->to('dashboard')
                 ->with('error', 'Пользователь не найден');
         }
 
@@ -88,11 +85,12 @@ class Dashboard extends BaseController
      * Настройки пользователя
      *
      * @return string|RedirectResponse
+     * @noinspection PhpUnused
      */
     public function settings(): string|RedirectResponse
     {
         if (!session()->get('is_logged_in')) {
-            return redirect()->to('/login');
+            return redirect()->to('login');
         }
 
         return view('dashboard/settings');
@@ -108,7 +106,7 @@ class Dashboard extends BaseController
     public function updateProfile(): RedirectResponse
     {
         if (!session()->get('is_logged_in')) {
-            return redirect()->to('/login');
+            return redirect()->to('login');
         }
 
         $userId = session()->get('user_id');
