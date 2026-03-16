@@ -49,9 +49,6 @@
                 <i class="fas fa-address-book fa-3x"></i>
                 <h2>У вас пока нет контактов</h2>
                 <p>Найдите пользователей и добавьте их в список контактов, чтобы начать общение.</p>
-                <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Найти пользователей
-                </a>
             </div>
         <?php else: ?>
             <div class="contacts-grid">
