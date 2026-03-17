@@ -121,13 +121,20 @@ class Message extends Model
      */
     public function getConversation(int $userId, int $contactId, int $limit = 50): array
     {
-        return $this->where("(sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?)", [
+        // Максимально простой SQL запрос через "сырой" запрос
+        $sql = "SELECT * FROM messages 
+            WHERE (sender_id = ? AND recipient_id = ?) 
+               OR (sender_id = ? AND recipient_id = ?) 
+            ORDER BY id DESC 
+            LIMIT ?";
+
+        $query = $this->db->query($sql, [
             $userId, $contactId,
-            $contactId, $userId
-        ])
-            ->orderBy('id', 'DESC')
-            ->limit($limit)
-            ->findAll();
+            $contactId, $userId,
+            $limit
+        ]);
+
+        return $query->getResultArray();
     }
 
     /**

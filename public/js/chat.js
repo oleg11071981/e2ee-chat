@@ -36,12 +36,37 @@ class ChatPoller {
         /** @type {number} */
         this.errorRetryDelay = 5000;
 
-        // Для веб-версии токен не нужен - используется сессия
-        this.token = null;
+        // Получаем CSRF токен из meta-тега или cookie
+        this.csrfToken = this.getCsrfToken();
 
         this.startPolling().catch(error => {
             console.error('Polling failed to start:', error);
         });
+    }
+
+    /**
+     * Получение CSRF токена из meta-тега или cookie
+     * @returns {string|null}
+     */
+    getCsrfToken() {
+        // Пытаемся получить из meta-тега
+        const metaToken = document.querySelector('meta[name="X-CSRF-TOKEN"]')?.getAttribute('content');
+        if (metaToken) return metaToken;
+
+        // Пытаемся получить из cookie
+        return this.getCookie('csrf_cookie');
+    }
+
+    /**
+     * Получение значения cookie по имени
+     * @param {string} name - Имя cookie
+     * @returns {string|null}
+     */
+    getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
     }
 
     /**
@@ -71,11 +96,16 @@ class ChatPoller {
      * @throws {Error}
      */
     async poll() {
-        const response = await fetch(`/api/chat/poll?last_id=${this.lastId}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        // Добавляем CSRF токен, если он есть
+        if (this.csrfToken) {
+            headers['X-CSRF-TOKEN'] = this.csrfToken;
+        }
+
+        const response = await fetch(`/api/chat/poll?last_id=${this.lastId}`, { headers });
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -105,11 +135,18 @@ class ChatPoller {
         formData.append('recipient_id', String(this.contactId));
         formData.append('message', String(text));
 
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        // Добавляем CSRF токен, если он есть
+        if (this.csrfToken) {
+            headers['X-CSRF-TOKEN'] = this.csrfToken;
+        }
+
         const response = await fetch('/api/chat/send', {
             method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            },
+            headers: headers,
             body: formData
         });
 
@@ -130,11 +167,15 @@ class ChatPoller {
      * @throws {Error}
      */
     async loadHistory(limit = 50) {
-        const response = await fetch(`/api/chat/history/${this.contactId}?limit=${limit}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        if (this.csrfToken) {
+            headers['X-CSRF-TOKEN'] = this.csrfToken;
+        }
+
+        const response = await fetch(`/api/chat/history/${this.contactId}?limit=${limit}`, { headers });
 
         /** @type {Object} */
         const data = await response.json();
@@ -158,12 +199,18 @@ class ChatPoller {
      * @returns {Promise<boolean>}
      */
     async markAsRead(messageId) {
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        };
+
+        if (this.csrfToken) {
+            headers['X-CSRF-TOKEN'] = this.csrfToken;
+        }
+
         const response = await fetch(`/api/chat/read/${messageId}`, {
             method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json'
-            }
+            headers: headers
         });
 
         return response.ok;
@@ -174,11 +221,15 @@ class ChatPoller {
      * @returns {Promise<number>}
      */
     async getUnreadCount() {
-        const response = await fetch('/api/chat/unread-count', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
+        const headers = {
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+
+        if (this.csrfToken) {
+            headers['X-CSRF-TOKEN'] = this.csrfToken;
+        }
+
+        const response = await fetch('/api/chat/unread-count', { headers });
 
         /** @type {Object} */
         const data = await response.json();

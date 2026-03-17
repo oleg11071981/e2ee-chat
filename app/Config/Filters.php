@@ -113,7 +113,10 @@ class Filters extends BaseFilters
     public array $filters = [
         'csrf' => [
             'except' => [
-                'api/*'  // Исключаем все API маршруты из CSRF защиты
+                'api/*',
+                'index.php/api/*',        // Добавляем с index.php
+                'api/chat/*',              // Добавляем конкретно чат
+                'index.php/api/chat/*'     // И с index.php
             ]
         ]
     ];
