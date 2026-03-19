@@ -9,7 +9,7 @@
 <?= $this->section('content') ?>
     <div class="home-container">
         <div class="hero">
-            <h1>🔐 E2EE Чат</h1>
+            <h1>🔐 Добро пожаловать в E2EE Чат</h1>
             <p class="hero-subtitle">Защищённое end-to-end шифрование для ваших сообщений</p>
 
             <div class="hero-buttons">
