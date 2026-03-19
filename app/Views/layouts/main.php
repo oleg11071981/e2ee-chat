@@ -15,48 +15,12 @@
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
-<!-- Шапка сайта -->
-<header class="header">
-    <div class="container">
-        <div class="logo">
-            <a href="<?= base_url('/') ?>">
-                <span class="logo-icon">🔐</span>
-                <span class="logo-text">E2EE Чат</span>
-            </a>
-        </div>
-
-        <!-- Кнопка бургер для мобильных -->
-        <button class="burger-menu" id="burgerMenu" aria-label="Меню">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-
-        <!-- Навигация -->
-        <nav class="nav" id="mainNav">
-            <?php if (session()->has('is_logged_in')): ?>
-                <a href="<?= base_url('logout') ?>" class="btn-logout">Выйти</a>
-            <?php else: ?>
-                <a href="<?= base_url('login') ?>">Вход</a>
-                <a href="<?= base_url('register') ?>">Регистрация</a>
-            <?php endif; ?>
-        </nav>
-    </div>
-</header>
-
 <!-- Основной контент -->
-<main class="main">
+<main class="main-full">
     <div class="container">
         <?= $this->renderSection('content') ?>
     </div>
 </main>
-
-<!-- Подвал -->
-<footer class="footer">
-    <div class="container">
-        <p>&copy; <?= date('Y') ?> E2EE Чат. Все права защищены.</p>
-    </div>
-</footer>
 
 <!-- Базовые скрипты -->
 <script src="<?= base_url('js/api.js') ?>"></script>
