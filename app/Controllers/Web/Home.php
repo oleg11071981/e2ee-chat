@@ -25,6 +25,7 @@ class Home extends BaseController
             return redirect()->to('dashboard');
         }
 
-        return view('web/home');
+        // Передаём переменную в представление
+        return view('web/home', ['hide_nav' => true]);
     }
 }

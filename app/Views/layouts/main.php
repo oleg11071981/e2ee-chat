@@ -15,8 +15,42 @@
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
+<!-- Шапка сайта -->
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <a href="<?= base_url('/') ?>">
+                <span class="logo-icon">🔐</span>
+                <span class="logo-text">E2EE Чат</span>
+            </a>
+        </div>
+
+        <?php
+        // Получаем переменную из контроллера
+        $hideNav = isset($hide_nav) ? $hide_nav : false;
+        if (!$hideNav):
+            ?>
+            <button class="burger-menu" id="burgerMenu" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <nav class="nav" id="mainNav">
+                <?php if (session()->has('is_logged_in')): ?>
+                    <a href="<?= base_url('dashboard') ?>">Личный кабинет</a>
+                    <a href="<?= base_url('logout') ?>" class="btn-logout">Выйти</a>
+                <?php else: ?>
+                    <a href="<?= base_url('login') ?>">Вход</a>
+                    <a href="<?= base_url('register') ?>">Регистрация</a>
+                <?php endif; ?>
+            </nav>
+        <?php endif; ?>
+    </div>
+</header>
+
 <!-- Основной контент -->
-<main class="main-full">
+<main class="main">
     <div class="container">
         <?= $this->renderSection('content') ?>
     </div>
