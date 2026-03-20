@@ -5,12 +5,12 @@
 <?= $this->section('styles') ?>
     <link rel="stylesheet" href="<?= base_url('css/chat.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <meta name="X-CSRF-TOKEN" content="<?= csrf_hash() ?>">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
     <div class="chat-container">
-        <div class="chat-sidebar">
+        <!-- Боковая панель с контактами -->
+        <div class="chat-sidebar" id="chatSidebar">
             <div class="chat-sidebar-header">
                 <h2>Контакты</h2>
                 <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary btn-sm">
@@ -22,10 +22,18 @@
                 <a href="<?= base_url('chat') ?>" class="back-link">
                     <i class="fas fa-arrow-left"></i> Назад к списку
                 </a>
-                <!-- Контакты будут загружены через JavaScript -->
             </div>
         </div>
 
+        <!-- Затемнение -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Кнопка открытия панели (мобильные) -->
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Основная область чата -->
         <div class="chat-main">
             <div class="chat-header">
                 <div class="chat-contact-info">
@@ -68,6 +76,29 @@
     </div>
 
     <script>
+        // Мобильное меню
+        const sidebar = document.getElementById('chatSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggleBtn = document.getElementById('sidebarToggle');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        toggleBtn?.addEventListener('click', openSidebar);
+        overlay?.addEventListener('click', closeSidebar);
+
+        // Закрываем при клике на ссылку
+        document.querySelectorAll('.contact-item, .back-link').forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+
         // Загружаем список контактов для боковой панели
         document.addEventListener('DOMContentLoaded', async function() {
             const contactsList = document.getElementById('contactsList');
@@ -81,26 +112,24 @@
 
                 const data = await response.json();
 
-                if (data.success) {
-                    if (data.contacts.length > 0) {
-                        const contactsHtml = data.contacts.map(contact => `
-                    <a href="/chat/${contact.id}" class="contact-item ${contact.is_active ? 'active' : ''}">
-                        <div class="contact-avatar">
-                            <span class="avatar-initials">${getInitials(contact.display_name || contact.username)}</span>
+                if (data.success && data.contacts.length > 0) {
+                    const contactsHtml = data.contacts.map(contact => `
+                <a href="/chat/${contact.id}" class="contact-item ${contact.is_active ? 'active' : ''}">
+                    <div class="contact-avatar">
+                        <span class="avatar-initials">${getInitials(contact.display_name || contact.username)}</span>
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">
+                            <span class="name">${escapeHtml(contact.display_name || contact.username)}</span>
+                            ${contact.is_active ? '<span class="online-indicator"></span>' : '<span class="offline-indicator"></span>'}
                         </div>
-                        <div class="contact-info">
-                            <div class="contact-name">
-                                <span class="name">${escapeHtml(contact.display_name || contact.username)}</span>
-                                ${contact.is_active ? '<span class="online-indicator" title="Онлайн"></span>' : ''}
-                            </div>
-                            <div class="contact-username">@${escapeHtml(contact.username)}</div>
-                        </div>
-                        <div class="contact-status">${contact.is_active ? 'Онлайн' : 'Офлайн'}</div>
-                    </a>
-                `).join('');
+                        <div class="contact-username">@${escapeHtml(contact.username)}</div>
+                    </div>
+                    <div class="contact-status">${contact.is_active ? 'Онлайн' : 'Офлайн'}</div>
+                </a>
+            `).join('');
 
-                        contactsList.insertAdjacentHTML('beforeend', contactsHtml);
-                    }
+                    contactsList.insertAdjacentHTML('beforeend', contactsHtml);
                 }
             } catch (error) {
                 console.error('Failed to load contacts:', error);

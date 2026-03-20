@@ -1,7 +1,7 @@
 /* ===== ЧАТ ===== */
 .chat-container {
     display: flex;
-    height: calc(100vh - 140px);
+    height: calc(100vh - 70px);
     background: white;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -15,6 +15,7 @@
     background: #f9f9f9;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease;
 }
 
 .chat-sidebar-header {
@@ -76,6 +77,12 @@
     flex-shrink: 0;
 }
 
+.avatar-initials {
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
 .contact-info {
     flex: 1;
     min-width: 0;
@@ -110,12 +117,31 @@
     color: var(--text-light);
 }
 
+.online-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--success-color);
+    margin-left: 5px;
+}
+
+.offline-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-light);
+    margin-left: 5px;
+}
+
 /* Основная область чата */
 .chat-main {
     flex: 1;
     display: flex;
     flex-direction: column;
     background: white;
+    overflow: hidden;
 }
 
 .chat-header {
@@ -124,6 +150,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: white;
+    flex-shrink: 0;
 }
 
 .chat-contact-info {
@@ -186,7 +214,7 @@
 }
 
 .message-content {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: 18px;
     position: relative;
     word-wrap: break-word;
@@ -202,25 +230,26 @@
     background: white;
     color: var(--text-color);
     border-bottom-left-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .message-text {
     font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 4px;
+    line-height: 1.4;
+    word-break: break-word;
 }
 
 .message-meta {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 6px;
-    font-size: 11px;
+    gap: 4px;
+    font-size: 10px;
+    margin-top: 4px;
 }
 
 .message.sent .message-meta {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .message.received .message-meta {
@@ -229,9 +258,10 @@
 
 /* Поле ввода */
 .message-input-container {
-    padding: 20px;
+    padding: 16px 20px;
     border-top: 1px solid var(--border-color);
     background: white;
+    flex-shrink: 0;
 }
 
 .message-form {
@@ -248,8 +278,8 @@
     resize: none;
     font-family: inherit;
     font-size: 14px;
-    line-height: 1.5;
-    max-height: 120px;
+    line-height: 1.4;
+    max-height: 100px;
     transition: border-color 0.2s;
 }
 
@@ -259,8 +289,8 @@
 }
 
 .send-button {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--primary-color);
     color: white;
@@ -296,10 +326,10 @@
 }
 
 .welcome-icon {
-    font-size: 80px;
+    font-size: 64px;
     color: var(--primary-color);
     margin-bottom: 20px;
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
 .welcome-screen h2 {
@@ -313,7 +343,16 @@
     font-size: 16px;
 }
 
-/* Пустые состояния */
+.back-link {
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+    color: var(--primary-color);
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
 .no-contacts {
     text-align: center;
     padding: 40px 20px;
@@ -330,28 +369,147 @@
     margin-bottom: 15px;
 }
 
-.back-link {
-    display: block;
-    padding: 10px;
-    text-decoration: none;
-    color: var(--primary-color);
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-/* Адаптивность */
+/* ===== МОБИЛЬНАЯ ВЕРСИЯ ===== */
 @media (max-width: 768px) {
     .chat-container {
-        flex-direction: column;
-        height: calc(100vh - 120px);
+        height: 100vh;
+        border-radius: 0;
+        position: relative;
     }
 
+    /* Боковая панель */
     .chat-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 85%;
+        max-width: 300px;
+        height: 100vh;
+        z-index: 1000;
+        transform: translateX(-100%);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-sidebar.open {
+        transform: translateX(0);
+    }
+
+    /* Кнопка открытия панели */
+    .sidebar-toggle {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    /* Основная область */
+    .chat-main {
         width: 100%;
-        height: 200px;
+    }
+
+    .chat-header {
+        padding: 12px 16px;
+    }
+
+    .chat-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .chat-contact-details h3 {
+        font-size: 15px;
+    }
+
+    .messages-container {
+        padding: 16px;
     }
 
     .message {
         max-width: 85%;
+    }
+
+    .message-content {
+        padding: 8px 12px;
+    }
+
+    .message-text {
+        font-size: 13px;
+    }
+
+    .message-input-container {
+        padding: 12px 16px;
+    }
+
+    .message-input {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .send-button {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .welcome-screen {
+        padding: 20px;
+    }
+
+    .welcome-icon {
+        font-size: 48px;
+    }
+
+    .welcome-screen h2 {
+        font-size: 20px;
+    }
+
+    .welcome-screen p {
+        font-size: 14px;
+    }
+
+    /* Затемнение */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+}
+
+/* Десктоп (скрываем кнопку-бургер) */
+@media (min-width: 769px) {
+    .sidebar-toggle {
+        display: none;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .chat-sidebar {
+        position: relative;
+        transform: none !important;
     }
 }
