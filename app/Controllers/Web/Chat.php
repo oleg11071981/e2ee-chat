@@ -39,7 +39,10 @@ class Chat extends BaseController
         $userId = session()->get('user_id');
         $contacts = $this->contactModel->getContacts($userId);
 
-        return view('chat/index', ['contacts' => $contacts]);
+        return view('chat/index', [
+            'contacts' => $contacts
+            // Шапка сайта остаётся (не передаём hide_header)
+        ]);
     }
 
     /**
@@ -74,7 +77,8 @@ class Chat extends BaseController
 
         return view('chat/conversation', [
             'contact' => $contact,
-            'userId' => $userId
+            'userId' => $userId,
+            'hide_header' => true  // Скрываем шапку сайта ТОЛЬКО в диалоге
         ]);
     }
 }

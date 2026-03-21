@@ -2,40 +2,21 @@
 
 <?= $this->section('title') ?>Чат с <?= esc($contact['display_name'] ?? $contact['username']) ?><?= $this->endSection() ?>
 
+<?= $this->section('hide_header') ?><?= $this->endSection() ?>
+
 <?= $this->section('styles') ?>
     <link rel="stylesheet" href="<?= base_url('css/chat.css') ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-    <div class="chat-container">
-        <!-- Боковая панель с контактами -->
-        <div class="chat-sidebar" id="chatSidebar">
-            <div class="chat-sidebar-header">
-                <h2>Контакты</h2>
-                <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Добавить
+    <div class="chat-page">
+        <!-- Шапка чата -->
+        <div class="chat-header-fixed">
+            <div class="chat-header-content">
+                <a href="<?= base_url('chat') ?>" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
                 </a>
-            </div>
-
-            <div class="contacts-list" id="contactsList">
-                <a href="<?= base_url('chat') ?>" class="back-link">
-                    <i class="fas fa-arrow-left"></i> Назад к списку
-                </a>
-            </div>
-        </div>
-
-        <!-- Затемнение -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-        <!-- Кнопка открытия панели (мобильные) -->
-        <button class="sidebar-toggle" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <!-- Основная область чата -->
-        <div class="chat-main">
-            <div class="chat-header">
                 <div class="chat-contact-info">
                     <div class="chat-avatar">
                         <?php
@@ -52,15 +33,19 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="messages-container" id="chatMessages"
-                 data-user-id="<?= $userId ?>"
-                 data-contact-id="<?= $contact['id'] ?>"
-                 data-contact-name="<?= esc($contact['display_name'] ?? $contact['username']) ?>">
-            </div>
+        <!-- Область сообщений (скролл) -->
+        <div class="messages-area" id="chatMessages"
+             data-user-id="<?= $userId ?>"
+             data-contact-id="<?= $contact['id'] ?>"
+             data-contact-name="<?= esc($contact['display_name'] ?? $contact['username']) ?>">
+        </div>
 
-            <div class="message-input-container">
-                <form id="sendMessageForm" class="message-form">
+        <!-- Поле ввода (фиксированное) -->
+        <div class="message-input-fixed">
+            <form id="sendMessageForm" class="message-form">
+                <div class="input-wrapper">
                 <textarea
                         id="messageInput"
                         placeholder="Введите сообщение..."
@@ -70,80 +55,57 @@
                     <button type="submit" id="sendBtn" class="send-button">
                         <i class="fas fa-paper-plane"></i>
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        // Мобильное меню
-        const sidebar = document.getElementById('chatSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const toggleBtn = document.getElementById('sidebarToggle');
-
-        function openSidebar() {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
+        // Авто-увеличение textarea
+        const textarea = document.getElementById('messageInput');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
         }
 
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        }
+        // Отправка по Enter
+        const form = document.getElementById('sendMessageForm');
+        const input = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
 
-        toggleBtn?.addEventListener('click', openSidebar);
-        overlay?.addEventListener('click', closeSidebar);
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-        // Закрываем при клике на ссылку
-        document.querySelectorAll('.contact-item, .back-link').forEach(link => {
-            link.addEventListener('click', closeSidebar);
-        });
+                const text = input.value.trim();
+                if (!text) return;
 
-        // Загружаем список контактов для боковой панели
-        document.addEventListener('DOMContentLoaded', async function() {
-            const contactsList = document.getElementById('contactsList');
+                input.disabled = true;
+                sendBtn.disabled = true;
 
-            try {
-                const response = await fetch('/contacts/get-for-chat', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+                try {
+                    const result = await window.chatPoller?.sendMessage(text);
+                    if (result) {
+                        input.value = '';
+                        input.style.height = 'auto';
                     }
-                });
-
-                const data = await response.json();
-
-                if (data.success && data.contacts.length > 0) {
-                    const contactsHtml = data.contacts.map(contact => `
-                <a href="/chat/${contact.id}" class="contact-item ${contact.is_active ? 'active' : ''}">
-                    <div class="contact-avatar">
-                        <span class="avatar-initials">${getInitials(contact.display_name || contact.username)}</span>
-                    </div>
-                    <div class="contact-info">
-                        <div class="contact-name">
-                            <span class="name">${escapeHtml(contact.display_name || contact.username)}</span>
-                            ${contact.is_active ? '<span class="online-indicator"></span>' : '<span class="offline-indicator"></span>'}
-                        </div>
-                        <div class="contact-username">@${escapeHtml(contact.username)}</div>
-                    </div>
-                    <div class="contact-status">${contact.is_active ? 'Онлайн' : 'Офлайн'}</div>
-                </a>
-            `).join('');
-
-                    contactsList.insertAdjacentHTML('beforeend', contactsHtml);
+                } catch (error) {
+                    alert('Ошибка: ' + error.message);
+                } finally {
+                    input.disabled = false;
+                    sendBtn.disabled = false;
+                    input.focus();
                 }
-            } catch (error) {
-                console.error('Failed to load contacts:', error);
-            }
-        });
+            });
 
-        function getInitials(name) {
-            return name.slice(0, 2).toUpperCase();
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
         }
     </script>
 <?= $this->endSection() ?>

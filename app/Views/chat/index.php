@@ -8,75 +8,62 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-    <div class="chat-container">
-        <div class="chat-sidebar">
-            <div class="chat-sidebar-header">
-                <h2>Контакты</h2>
-                <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Добавить
-                </a>
-            </div>
-
-            <div class="contacts-list" id="contactsList">
-                <div class="loading">Загрузка контактов...</div>
-            </div>
+    <div class="chat-list-page">
+        <div class="chat-list-header">
+            <h1>Чаты</h1>
+            <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Новый чат
+            </a>
         </div>
 
-        <div class="chat-main">
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-icon">
-                    <i class="fas fa-comments"></i>
-                </div>
-                <h2>Добро пожаловать в чат!</h2>
-                <p>Выберите контакт из списка слева, чтобы начать общение</p>
-            </div>
+        <div class="chat-list" id="chatList">
+            <div class="loading">Загрузка...</div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            const contactsList = document.getElementById('contactsList');
+            const chatList = document.getElementById('chatList');
 
             try {
                 const response = await fetch('/contacts/get-for-chat', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
                     if (data.contacts.length === 0) {
-                        contactsList.innerHTML = `
-                    <div class="no-contacts">
-                        <i class="fas fa-address-book"></i>
-                        <p>У вас пока нет контактов</p>
-                        <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary btn-sm">
+                        chatList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>У вас пока нет чатов</p>
+                        <a href="<?= base_url('contacts/search') ?>" class="btn btn-primary">
                             Найти пользователей
                         </a>
                     </div>
                 `;
                     } else {
-                        contactsList.innerHTML = data.contacts.map(contact => `
-                    <a href="/chat/${contact.id}" class="contact-item ${contact.is_active ? 'active' : ''}">
-                        <div class="contact-avatar">
+                        chatList.innerHTML = data.contacts.map(contact => `
+                    <a href="/chat/${contact.id}" class="chat-item">
+                        <div class="chat-avatar">
                             <span class="avatar-initials">${getInitials(contact.display_name || contact.username)}</span>
                         </div>
-                        <div class="contact-info">
-                            <div class="contact-name">
+                        <div class="chat-info">
+                            <div class="chat-name">
                                 <span class="name">${escapeHtml(contact.display_name || contact.username)}</span>
-                                ${contact.is_active ? '<span class="online-indicator" title="Онлайн"></span>' : ''}
+                                <span class="time">—</span>
                             </div>
-                            <div class="contact-username">@${escapeHtml(contact.username)}</div>
+                            <div class="chat-preview">
+                                <span class="preview-text">Нажмите для начала диалога</span>
+                            </div>
                         </div>
-                        <div class="contact-status">${contact.is_active ? 'Онлайн' : 'Офлайн'}</div>
                     </a>
                 `).join('');
                     }
                 }
             } catch (error) {
-                contactsList.innerHTML = '<div class="error">Ошибка загрузки контактов</div>';
+                chatList.innerHTML = '<div class="error">Ошибка загрузки</div>';
                 console.error(error);
             }
         });
