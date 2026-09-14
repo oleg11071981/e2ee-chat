@@ -1,9 +1,34 @@
+/* ===== ФИКС ДЛЯ СТРАНИЦЫ ЧАТА ===== */
+/* Принудительно фиксируем страницу чата, убираем лишние скроллы */
+main.chat-layout {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+main.chat-layout .container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
 /* ===== СТРАНИЦА ЧАТА ===== */
 .chat-page {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     background: #f5f7fa;
+    overflow: hidden;
 }
 
 /* Шапка чата (фиксированная) */
